@@ -1,0 +1,52 @@
+---
+- name: Configure Couchbase Nodes and Cluster
+  hosts: all
+  become_method: sudo
+  vars:
+    couchbase_port: 8091
+    couchbase_username: dbadmin
+    couchbase_password: foobar
+    data_ramsize: 1024
+    index_ramsize: 1024
+    data_path: /cbdata
+    index_path: /cbdata
+    master_hostname: X.X.X.X
+  tasks:
+    - name: Node Initialize (master) - need this before others
+      become: yes
+      shell: ./couchbase-cli node-init \
+        -u="{{ couchbase_username }}" -p="{{ couchbase_password }}" \
+        -c="{{ hostvars[inventory_hostname] }}":{{ coucbbase_port }} \
+        --node-init-data-path={{ data_path }} \
+        --node-init-data-path={{ data_path }} \
+        --node-init-hostname="{{ hostvars[inventory_hostname] }}"
+      args:
+        chdir: /opt/couchbase/bin
+      when: inventory_hostname = master_hostname
+    
+    - name: Node Initialize (all other nodes)
+      become: yes
+      shell: ./couchbase-cli node-init \
+        -u="{{ couchbase_username }}" -p="{{ couchbase_password }}" \
+        -c="{{ hostvars[master_hostname] }}":{{ coucbbase_port }} \
+        --node-init-data-path={{ data_path }} \
+        --node-init-data-path={{ data_path }} \
+        --node-init-hostname="{{ hostvars[inventory_hostname] }}"
+      args:
+        chdir: /opt/couchbase/bin
+      when: inventory_hostname != master_hostname
+
+    - name: Cluster Initialize
+      become: yes
+      shell: ./couchbase-cli cluster-init \
+        --cluster-username="{{ couchbase_username }}" \
+        --cluster-password="{{ couchbase_password }}" \
+        --cluster-port="{{ couchbase_port }}" \
+        --cluster-ramsize={{ data_ramsize }} \
+        --cluster-index-ramsize={{ index_ramsize }} \
+        --index-storage-setting=default \
+        --services=data
+      args:
+        chdir: /opt/couchbase/bin
+      when: inventory_hostname = master_hostname
+            

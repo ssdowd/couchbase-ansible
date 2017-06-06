@@ -1,0 +1,84 @@
+---
+  - name: Install Couchbase
+    hosts:  all
+    become_method: sudo
+    vars:
+      couchbase_port:8091
+    tasks:
+      - name: Instructs the kernel to swap only as a last resort. Set this to 1 if on a kernel version > 3.0 vm.swappiness = 0
+        become: yes
+        sysctl: name=vm.swappiness value=1 state=present
+        
+      - name: Disable THP
+        become: yes
+        shell: "{{ item }}"
+        with_items:
+          - echo 'echo never > /sys/kernel/mm/transparent_hugepage/enabled' >> /etc/rc.local
+          - echo 'echo never > /sys/kernel/mm/transparent_hugepage/defrag' >> /etc/rc.local
+          - echo never > /sys/kernel/mm/transparent_hugepage/enabled
+          - echo never > /sys/kernel/mm/transparent_hugepage/defrag
+          
+      - name: Increase frequency of keepalive probes, identifiying and timing out dead connections faster
+        become: yes
+        sysctl: name=net.ipv4.tcp_keepalive_intvl value=30 state=present
+
+      - name: Enables reuse of TIME-WAIT sockets to reduce the time spent constructing connections. This setting is safe for all Couchbase protocols. 
+        become: yes
+        sysctl: name=net.ipv4.tcp_tw_reuse value=1 state=present
+
+        # The default 20% of total system memory can overwhelm the storage system # once flushed.
+      - name: Limits the maximum memory used to 200MB before pdflush is involved.
+        become: yes
+        sysctl: name=vm.dirty_bytes value=209715200 state=present
+
+      - name: The lower threshold for vm.dirty_bytes 
+        become: yes
+        sysctl: name=vm.dirty_background_bytes value=104857600 state=present
+
+      - name: Increases the rate at which data is flushed to disk  vm.dirty_writeback_centisecs = 100
+        become: yes
+        sysctl: name=vm.dirty_expire_centisecs value=300 state=present
+
+      - name: Increases the rate at which data is flushed to disk (2)
+        become: yes
+        sysctl: name=vm.dirty_writeback_centisecs value=100 state=present
+
+      - name: Increases the max open file handles. 
+        become: yes
+        sysctl: name=fs.file-max value=500000 state=present
+
+      - name: Disables NUMA zone reclaim algorithm. This tends to decrease read latencies. 
+        become: yes
+        sysctl: name=vm.zone_reclaim_mode value=0 state=present
+
+
+      - name: Install Couchbase Server
+        become: yes
+        yum: name=couchbase-server state=latest
+        
+      - name: Start Couchbase Server
+        become: yes
+        service: name=couchbase-server state=started
+        
+      - name: Wait for Couchbase initialization
+        wait_for: {{ couchbase_port }} delay=2
+        
+      - name: Check for numactl installed (but do not install it)
+        yum:
+          list: numactl
+        register: numactl_reg
+        
+      - name: Update init script with numactl (only if numactl is installed)
+        become: yes
+        replace:
+          dest=/etc/init.d/couchbase-server
+          regexp='daemon --user couchbase .DAEMON'
+          replace='daemon --user couchbase "numactl --interleave=all $DAEMON"'
+        when: (numactl_reg.results|length > 1) and (numactl_reg[1].yumstate == 'installed')
+      
+      - name: Restart Couchbase Server (with numactl)
+        become: yes
+        service: name=couchbase-server state=restarted
+        
+      - name: Wait for restarted Couchbase server
+        wait_for: port={{ couchbase_port }} delay=2

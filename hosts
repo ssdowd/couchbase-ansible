@@ -1,0 +1,8 @@
+[master]
+172.31.10.114 ansible_hostname=52.57.246.212
+
+[datanodes]
+172.31.14.201 ansible_hostname=35.157.252.255
+
+[querynodes]
+172.31.2.227 ansible_hostname=52.59.91.211

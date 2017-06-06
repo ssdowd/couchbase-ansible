@@ -1,0 +1,8 @@
+---
+  - name: Overall Couchbase Deployment
+    tasks:
+      - include: 01_install_couchbase.yml
+      - include: 02_configure_couchbase.yml
+      - include: 03_add_couchbase_data_nodes.yml
+      - include: 04_add_couchbase_query_and_index_nodes.yml
+      - include: 05_couchbase_rebalance.yml

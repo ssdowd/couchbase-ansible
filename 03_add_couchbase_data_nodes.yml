@@ -1,0 +1,26 @@
+---
+  - name: Add Couchbase Data Nodes
+    hosts: datanodes
+    become_method: sudo
+    vars:
+      couchbase_port: 8091
+      couchbase_username: dbadmin
+      couchbase_password: foobar
+      data_ramsize: 1024
+      index_ramsize: 1024
+      data_path: /cbdata
+      index_path: /cbdata
+      master_hostname: X.X.X.X
+    tasks:
+      - name: Add Server Data nodes
+        become: no
+        shell: ./couchbase-cli server-add \
+          --cluster="{{ master_hostanme }}:{{ couchbase_port }}" \
+          --user="{{ couchbase_username }}" \
+          --password="{{ couchbase_password }}" \
+          --server-add-user="{{ couchbase_username }}" \
+          --server-add-password="{{ couchbase_password }}" \
+          --server-add="{{ hostvars[inventory_hostname] }}" \
+          --services=data
+        args:
+          chdir: /opt/couchbase/bin
