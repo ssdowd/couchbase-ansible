@@ -1,0 +1,7 @@
+---
+- name: Test Nodes
+  hosts: all
+  tasks:
+    - name: Show me something
+      shell: echo hostvars[inventory_hostname] is "{{ hostvars[inventory_hostname].groups.master[0] }}", "{{ master_hostname }}" > /tmp/ssd.out
+      when: inventory_hostname == master_inventoryname
