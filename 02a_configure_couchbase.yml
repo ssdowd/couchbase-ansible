@@ -1,0 +1,19 @@
+---
+- name: Configure Couchbase Nodes and Cluster
+  hosts: master
+  become_method: sudo
+  tasks:
+    - name: Make data dir... /cbdata
+      become: yes
+      file: path={{ data_path }} state=directory owner=couchbase group=couchbase mode=u=rwx,g=rx,o=
+      
+    - name: Node Initialize (master) - need this before others
+      become: yes
+      shell: ./couchbase-cli node-init \
+        -c "{{ master_hostname }}:{{ couchbase_port }}" \
+        -u "{{ couchbase_username }}" -p "{{ couchbase_password }}" \
+        --node-init-data-path={{ data_path }} \
+        --node-init-data-path={{ data_path }} \
+        --node-init-hostname="{{ hostvars[inventory_hostname].ansible_default_ipv4.address }}"
+      args:
+        chdir: /opt/couchbase/bin

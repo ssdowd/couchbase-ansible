@@ -1,0 +1,15 @@
+---
+- name: Configure Couchbase Nodes and Cluster
+  hosts: all
+  become_method: sudo
+  tasks:
+    - name: Node Initialize (all other nodes)
+      shell: ./couchbase-cli node-init \
+        -c "{{ hostvars[inventory_hostname].ansible_default_ipv4.address }}:{{ couchbase_port }}" \
+        -u "{{ couchbase_username }}" -p "{{ couchbase_password }}" \
+        --node-init-data-path={{ data_path }} \
+        --node-init-data-path={{ data_path }} \
+        --node-init-hostname="{{ hostvars[inventory_hostname].ansible_default_ipv4.address }}"
+      args:
+        chdir: /opt/couchbase/bin
+      when: inventory_hostname != master_hostname

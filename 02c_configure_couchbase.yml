@@ -1,0 +1,18 @@
+---
+- name: Configure Couchbase Nodes and Cluster
+  hosts: master
+  become_method: sudo
+  tasks:
+    - name: Cluster Initialize
+      become: yes
+      shell: ./couchbase-cli cluster-init \
+        --cluster-username="{{ couchbase_username }}" \
+        --cluster-password="{{ couchbase_password }}" \
+        --cluster-port="{{ couchbase_port }}" \
+        --cluster-ramsize={{ data_ramsize }} \
+        --cluster-index-ramsize={{ index_ramsize }} \
+        --index-storage-setting=default \
+        --services=data
+      args:
+        chdir: /opt/couchbase/bin
+            

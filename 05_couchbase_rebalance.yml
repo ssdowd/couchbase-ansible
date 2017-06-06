@@ -1,10 +1,6 @@
 ---
   - name: Couchbase Cluster Rebalance
     hosts: master
-    vars:
-      couchbase_port: 8091
-      couchbase_username: dbadmin
-      couchbase_password: foobar
     tasks:
       - name: Rebalance the Cluster
         shell: ./couchbase-cli rebalance \

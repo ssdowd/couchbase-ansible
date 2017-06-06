@@ -1,15 +1,6 @@
 ---
   - name: Add Couchbase Query and Index Nodes
     hosts: querynodes
-    vars:
-      couchbase_port: 8091
-      couchbase_username: dbadmin
-      couchbase_password: foobar
-      data_ramsize: 1024
-      index_ramsize: 1024
-      data_path: /cbdata
-      index_path: /cbdata
-      master_hostname: X.X.X.X
     tasks:
       - name: Add Server Query and Index nodes
         become: no
