@@ -68,7 +68,7 @@
 
     - name: Disables NUMA zone reclaim algorithm. This tends to decrease read latencies. 
       become: yes
-      sysctl: name=vm.zone_reclaim_mode value=0 state=present
+      sysctl: name=vm.zone_reclaim_mode value=0 state=present reload=yes
 
 
     - name: Install Couchbase Server
