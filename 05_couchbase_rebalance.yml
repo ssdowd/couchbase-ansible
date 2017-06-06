@@ -4,7 +4,7 @@
     tasks:
       - name: Rebalance the Cluster
         shell: ./couchbase-cli rebalance \
-          --cluster="{{ master_hostanme }}:{{ couchbase_port }}" \
+          --cluster="{{ master_hostname }}:{{ couchbase_port }}" \
           --user="{{ couchbase_username }}" \
           --password="{{ couchbase_password }}"
         args:
