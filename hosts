@@ -15,6 +15,8 @@ index_path=/cbdata
 [datanodes]
 35.157.252.255 ansible_hostname=172.31.14.201
 52.57.246.212 ansible_hostname=172.31.10.114
+52.59.146.56 ansible_hostname=172.31.5.173
+
 
 [querynodes]
 52.59.91.211 ansible_hostname=172.31.2.227
