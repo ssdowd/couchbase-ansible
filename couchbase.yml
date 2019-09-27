@@ -1,0 +1,6 @@
+---
+# file: couchbase.yml
+- hosts: couchbase
+  roles:
+    - common
+    - couchbase

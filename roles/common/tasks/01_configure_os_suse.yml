@@ -1,6 +1,6 @@
 ---
 - name: Configure OS/Kernel Settings - SUSE
-  hosts:  all
+  hosts: all
   become_method: sudo
   tasks:
     - name: upgrade all packages

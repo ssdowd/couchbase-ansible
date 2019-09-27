@@ -1,15 +1,11 @@
 ---
 - name: Install Couchbase
-  hosts:  all
-  vars:
-    couchbaseVersion: 6.5.0-beta
-    platform: suse12
-    downloadurl: https://packages.couchbase.com/releases/{{ version }}/couchbase-server-enterprise-{{ version }}-{{ platform }}.x86_64.rpm
+  hosts: all
   become_method: sudo
   tasks:
     - name: Download Couchbase rpm file
       geturl: 
-        url: {{ downloadurl }}
+        url: "{{ downloadurl }}"
         dest: /tmp/couchbase-server-enterprise-{{ version }}-{{ platform }}.x86_64.rpm
         mode: 0440
 
