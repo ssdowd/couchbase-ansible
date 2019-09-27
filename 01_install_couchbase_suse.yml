@@ -1,0 +1,31 @@
+---
+- name: Install Couchbase
+  hosts:  all
+  vars:
+    couchbaseVersion: 6.5.0-beta
+    platform: suse12
+    downloadurl: https://packages.couchbase.com/releases/{{ version }}/couchbase-server-enterprise-{{ version }}-{{ platform }}.x86_64.rpm
+  become_method: sudo
+  tasks:
+    - name: Download Couchbase rpm file
+      geturl: 
+        url: {{ downloadurl }}
+        dest: /tmp/couchbase-server-enterprise-{{ version }}-{{ platform }}.x86_64.rpm
+        mode: 0440
+
+    - name: Install Couchbase Server from RPM file
+      become: yes
+      zypper: 
+        name: /tmp/couchbase-server-enterprise-{{ version }}-{{ platform }}.x86_64.rpm
+        state: present
+      
+    - name: Start Couchbase Server
+      become: yes
+      service: name=couchbase-server state=started
+      
+    - name: Wait for Couchbase initialization
+      wait_for: port={{ couchbase_port }} delay=2
+      
+    - name: Make data dir... /cbdata
+      become: yes
+      file: path={{ data_path }} state=directory owner=couchbase group=couchbase mode=u=rwx,g=rx,o=
