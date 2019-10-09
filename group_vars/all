@@ -1,0 +1,4 @@
+os: suse
+couchbaseVersion: 6.5.0-beta
+platform: suse12
+downloadurl: https://packages.couchbase.com/releases/{{ couchbaseVersion }}/couchbase-server-enterprise-{{ couchbaseVersion }}-{{ platform }}.x86_64.rpm

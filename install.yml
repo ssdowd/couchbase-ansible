@@ -1,18 +1,2 @@
 ---
-- name: Overall Couchbase Deployment
-  hosts: all
-  vars:
-    os: suse
-    couchbaseVersion: 6.5.0-beta
-    platform: suse12
-    downloadurl: https://packages.couchbase.com/releases/{{ version }}/couchbase-server-enterprise-{{ version }}-{{ platform }}.x86_64.rpm
-  tasks:
-    - include: 01_configure_os_{{ os }}.yml
-    - include: 05_couchbase_rebalance.yml
-    # - include: 01_install_couchbase_suse.yml
-    # - include: 02a_configure_couchbase.yml
-    # - include: 02b_configure_couchbase.yml
-    # - include: 02c_configure_couchbase.yml
-    # - include: 03_add_couchbase_data_nodes.yml
-    # - include: 04_add_couchbase_query_and_index_nodes.yml
-    # - include: 05_couchbase_rebalance.yml
+- import_playbook: couchbase.yml
